@@ -119,11 +119,8 @@ class ECMEstimate(EMEstimate):
 
         Maximisation step of the ECM-algorithm.
 
-        :param samples: Dataframe with comparison vectors.
-        :param weights: The number of times the comparison vectors
-                        samples occur. This frame needs to have the
-                        same index as samples.
-        :param prob: The expectation of comparison vector in samples.
+        :param y_enc: Dataframe with comparison vectors.
+        :param g: The expectation of comparison vector in y_enc.
 
         :return: A dict of marginal m-probabilities, a dict of marginal
                         u-probabilities and the match prevalence.

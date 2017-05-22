@@ -563,7 +563,7 @@ class ECMClassifier(FellegiSunter):
 
         # self.algorithm = ECMEstimate()
 
-    def learn(self, comparison_vectors, params_init=None, return_type='index'):
+    def learn(self, comparison_vectors, params_init=None, p_threshold=None, return_type='index'):
         """ Train the algorithm.
 
         Train the Expectation-Maximisation classifier. This method is well-
@@ -577,6 +577,9 @@ class ECMClassifier(FellegiSunter):
         params_init : dict
             A dictionary with initial parameters of the ECM algorithm
             (optional).
+        p_threshold: float
+            Probability threshold used to classify record. 
+            If None, use an heuristic to estimate the probability threshold.
         return_type : 'index' (default), 'series', 'array'
             The format to return the classification result. The argument value
             'index' will return the pandas.MultiIndex of the matches. The
@@ -597,15 +600,18 @@ class ECMClassifier(FellegiSunter):
         self.algorithm = ECMEstimate(**params_init)
         probs = self.algorithm.train(comparison_vectors.as_matrix())
 
-        n_matches = int(self.algorithm.p * len(probs))
-        self.p_threshold = numpy.sort(probs)[len(probs) - n_matches]
+        if p_threshold is None:
+            n_matches = int(self.algorithm.p * len(probs))
+            self.p_threshold = numpy.sort(probs)[len(probs) - n_matches]
+        else:
+            self.p_threshold = p_threshold
 
         prediction = self._decision_rule(probs, self.p_threshold)
 
         return self._return_result(prediction, return_type, comparison_vectors)
 
     def predict(self, comparison_vectors, return_type='index', *args, **kwargs):
-        """Predict the class of reord pairs.
+        """Predict the class of record pairs.
 
         Classify a set of record pairs based on their comparison vectors into
         matches, non-matches and possible matches. The classifier has to be
@@ -633,7 +639,6 @@ class ECMClassifier(FellegiSunter):
         Prediction is risky for this unsupervised learning method. Be aware
         that the sample from the population is valid.
 
-
         """
 
         enc_vectors = self.algorithm._transform_vectors(
@@ -654,8 +659,6 @@ class ECMClassifier(FellegiSunter):
         ----------
         comparison_vectors : pandas.DataFrame
             The dataframe with comparison vectors.
-        return_type : 'series' or 'array'
-            Return a pandas series or numpy array. Default 'series'.
 
         Returns
         -------
