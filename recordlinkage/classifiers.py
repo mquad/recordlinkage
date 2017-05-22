@@ -561,9 +561,9 @@ class ECMClassifier(FellegiSunter):
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
 
-        self.algorithm = ECMEstimate()
+        # self.algorithm = ECMEstimate()
 
-    def learn(self, comparison_vectors, init='jaro', return_type='index'):
+    def learn(self, comparison_vectors, init_params=None, return_type='index'):
         """ Train the algorithm.
 
         Train the Expectation-Maximisation classifier. This method is well-
@@ -592,6 +592,9 @@ class ECMClassifier(FellegiSunter):
 
         """
 
+        if init_params is None:
+            init_params = dict()
+        self.algorithm = ECMEstimate(**init_params)
         probs = self.algorithm.train(comparison_vectors.as_matrix())
 
         n_matches = int(self.algorithm.p * len(probs))
