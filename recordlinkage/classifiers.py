@@ -563,7 +563,7 @@ class ECMClassifier(FellegiSunter):
 
         # self.algorithm = ECMEstimate()
 
-    def learn(self, comparison_vectors, init_params=None, return_type='index'):
+    def learn(self, comparison_vectors, params_init=None, return_type='index'):
         """ Train the algorithm.
 
         Train the Expectation-Maximisation classifier. This method is well-
@@ -592,9 +592,9 @@ class ECMClassifier(FellegiSunter):
 
         """
 
-        if init_params is None:
-            init_params = dict()
-        self.algorithm = ECMEstimate(**init_params)
+        if params_init is None:
+            params_init = dict()
+        self.algorithm = ECMEstimate(**params_init)
         probs = self.algorithm.train(comparison_vectors.as_matrix())
 
         n_matches = int(self.algorithm.p * len(probs))
