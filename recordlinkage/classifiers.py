@@ -610,7 +610,7 @@ class ECMClassifier(FellegiSunter):
 
         return self._return_result(prediction, return_type, comparison_vectors)
 
-    def predict(self, comparison_vectors, return_type='index', *args, **kwargs):
+    def predict(self, comparison_vectors, p_threshold=None, return_type='index'):
         """Predict the class of record pairs.
 
         Classify a set of record pairs based on their comparison vectors into
@@ -627,6 +627,9 @@ class ECMClassifier(FellegiSunter):
             argument value 'series' will return a pandas.Series with zeros
             (distinct) and ones (matches). The argument value 'array' will
             return a numpy.ndarray with zeros and ones.
+        p_threshold: float
+            Probability threshold used to classify record. 
+            If None, use an heuristic to estimate the probability threshold.
 
         Returns
         -------

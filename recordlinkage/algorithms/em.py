@@ -122,8 +122,8 @@ class ECMEstimate(EMEstimate):
         :param y_enc: Dataframe with comparison vectors.
         :param g: The expectation of comparison vector in y_enc.
 
-        :return: A dict of marginal m-probabilities, a dict of marginal
-                        u-probabilities and the match prevalence.
+        :return: A numpy array of marginal m-probabilities,
+         a numpy array of marginal u-probabilities and the match prevalence.
         :rtype: (dict, dict, float)
 
         """
@@ -134,7 +134,7 @@ class ECMEstimate(EMEstimate):
 
         return m, u, p
 
-    def _expectation(self, y_enc):
+    def _expectation_bak(self, y_enc):
         """
 
         Compute the expectation of the given comparison vectors.
@@ -148,6 +148,24 @@ class ECMEstimate(EMEstimate):
         # Winkler for details about the algorithm.
         m = numpy.exp(y_enc.dot(numpy.log(self._m)))
         u = numpy.exp(y_enc.dot(numpy.log(self._u)))
+        p = self._p
+
+        return p * m / (p * m + (1 - p) * u)
+
+    def _expectation(self, y_enc):
+        """
+
+        Compute the expectation of the given comparison vectors.
+
+        :return: A Series with the expectation.
+        :rtype: pandas.Series
+        """
+
+        # The following approach has a lot of computational advantages. But if
+        # there is a better method, replace it. See Herzog, Scheuren and
+        # Winkler for details about the algorithm.
+        m = numpy.exp(y_enc.dot(numpy.log(self._m) + (1-y_enc).dot(numpy.log(1. - self._m))))
+        u = numpy.exp(y_enc.dot(numpy.log(self._u) + (1-y_enc).dot(numpy.log(1. - self._u))))
         p = self._p
 
         return p * m / (p * m + (1 - p) * u)
