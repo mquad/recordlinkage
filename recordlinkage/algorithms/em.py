@@ -95,7 +95,9 @@ class ECMEstimate(EMEstimate):
 
             # Maximisation step
             self._m, self._u, self._p = self._maximization(y, g)
-
+            print(self._m)
+            print(self._u)
+            print(self._p)
             # Increment counter
             self._iteration += 1
 
