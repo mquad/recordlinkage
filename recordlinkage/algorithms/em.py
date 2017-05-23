@@ -95,9 +95,7 @@ class ECMEstimate(EMEstimate):
 
             # Maximisation step
             self._m, self._u, self._p = self._maximization(y, g)
-            print(self._m)
-            print(self._u)
-            print(self._p)
+
             # Increment counter
             self._iteration += 1
 
@@ -121,37 +119,23 @@ class ECMEstimate(EMEstimate):
 
         Maximisation step of the ECM-algorithm.
 
-        :param y_enc: Dataframe with comparison vectors.
-        :param g: The expectation of comparison vector in y_enc.
+        :param samples: Dataframe with comparison vectors.
+        :param weights: The number of times the comparison vectors
+                        samples occur. This frame needs to have the
+                        same index as samples.
+        :param prob: The expectation of comparison vector in samples.
 
-        :return: A numpy array of marginal m-probabilities,
-         a numpy array of marginal u-probabilities and the match prevalence.
+        :return: A dict of marginal m-probabilities, a dict of marginal
+                        u-probabilities and the match prevalence.
         :rtype: (dict, dict, float)
 
         """
-        m = numpy.dot(g.T, y_enc) / numpy.sum(g)
-        u = numpy.dot((1 - g).T, y_enc) / numpy.sum(1 - g)
+
+        m = g.T * y_enc / numpy.sum(g)
+        u = (1 - g).T * y_enc / numpy.sum(1 - g)
         p = numpy.average(g)
 
         return m, u, p
-
-    def _expectation_bak(self, y_enc):
-        """
-
-        Compute the expectation of the given comparison vectors.
-
-        :return: A Series with the expectation.
-        :rtype: pandas.Series
-        """
-
-        # The following approach has a lot of computational advantages. But if
-        # there is a better method, replace it. See Herzog, Scheuren and
-        # Winkler for details about the algorithm.
-        m = numpy.exp(y_enc.dot(numpy.log(self._m)))
-        u = numpy.exp(y_enc.dot(numpy.log(self._u)))
-        p = self._p
-
-        return p * m / (p * m + (1 - p) * u)
 
     def _expectation(self, y_enc):
         """
@@ -165,8 +149,8 @@ class ECMEstimate(EMEstimate):
         # The following approach has a lot of computational advantages. But if
         # there is a better method, replace it. See Herzog, Scheuren and
         # Winkler for details about the algorithm.
-        m = numpy.exp(y_enc.dot(numpy.log(self._m + 1e-12)) + (1-y_enc).dot(numpy.log(1. - self._m + 1e-12)))
-        u = numpy.exp(y_enc.dot(numpy.log(self._u + 1e-12)) + (1-y_enc).dot(numpy.log(1. - self._u + 1e-12)))
+        m = numpy.exp(y_enc.dot(numpy.log(self._m)))
+        u = numpy.exp(y_enc.dot(numpy.log(self._u)))
         p = self._p
 
         return p * m / (p * m + (1 - p) * u)
@@ -212,7 +196,7 @@ class ECMEstimate(EMEstimate):
             # Append the encoded data to the dataframe
             data_enc.append(data_enc_i)
 
-        return hstack(data_enc).toarray()
+        return hstack(data_enc)
 
     def _transform_vectors(self, vectors):
         """
@@ -239,4 +223,4 @@ class ECMEstimate(EMEstimate):
             # Append the encoded data to the dataframe
             data_enc.append(data_enc_i)
 
-        return hstack(data_enc).toarray()
+        return hstack(data_enc)
