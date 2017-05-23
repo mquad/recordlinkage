@@ -127,9 +127,8 @@ class ECMEstimate(EMEstimate):
         :rtype: (dict, dict, float)
 
         """
-
-        m = g.T * y_enc / numpy.sum(g)
-        u = (1 - g).T * y_enc / numpy.sum(1 - g)
+        m = numpy.dot(g.T, y_enc) / numpy.sum(g)
+        u = numpy.dot((1 - g).T, y_enc) / numpy.sum(1 - g)
         p = numpy.average(g)
 
         return m, u, p
@@ -164,8 +163,8 @@ class ECMEstimate(EMEstimate):
         # The following approach has a lot of computational advantages. But if
         # there is a better method, replace it. See Herzog, Scheuren and
         # Winkler for details about the algorithm.
-        m = numpy.exp(y_enc.dot(numpy.log(self._m) + (1-y_enc).dot(numpy.log(1. - self._m))))
-        u = numpy.exp(y_enc.dot(numpy.log(self._u) + (1-y_enc).dot(numpy.log(1. - self._u))))
+        m = numpy.exp(y_enc.dot(numpy.log(self._m)) + (1-y_enc).dot(numpy.log(1. - self._m)))
+        u = numpy.exp(y_enc.dot(numpy.log(self._u)) + (1-y_enc).dot(numpy.log(1. - self._u)))
         p = self._p
 
         return p * m / (p * m + (1 - p) * u)
@@ -211,7 +210,7 @@ class ECMEstimate(EMEstimate):
             # Append the encoded data to the dataframe
             data_enc.append(data_enc_i)
 
-        return hstack(data_enc)
+        return hstack(data_enc).toarray()
 
     def _transform_vectors(self, vectors):
         """
@@ -238,4 +237,4 @@ class ECMEstimate(EMEstimate):
             # Append the encoded data to the dataframe
             data_enc.append(data_enc_i)
 
-        return hstack(data_enc)
+        return hstack(data_enc).toarray()
