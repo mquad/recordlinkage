@@ -149,8 +149,8 @@ class ECMEstimate(EMEstimate):
         # The following approach has a lot of computational advantages. But if
         # there is a better method, replace it. See Herzog, Scheuren and
         # Winkler for details about the algorithm.
-        m = numpy.exp(y_enc.dot(numpy.log(self._m)))
-        u = numpy.exp(y_enc.dot(numpy.log(self._u)))
+        m = numpy.exp(y_enc.dot(numpy.log(self._m + 1e-12)))
+        u = numpy.exp(y_enc.dot(numpy.log(self._u + 1e-12)))
         p = self._p
 
         return p * m / (p * m + (1 - p) * u)
